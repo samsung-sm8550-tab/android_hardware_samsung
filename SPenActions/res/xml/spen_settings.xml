@@ -5,7 +5,7 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:key="spen_bluetooth_enable"
         android:defaultValue="false"
         android:title="@string/spen_bluetooth_enable_title"
