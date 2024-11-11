@@ -14,6 +14,7 @@
 #include "LegacyHAL.h"
 #include "LockoutTracker.h"
 #include "SecUdfpsHelper.h"
+#include "OpticalUdfps.h"
 
 #define FINGERPRINT_DATA_DIR "/data/vendor/biometrics/fp/User_%d/"
 
@@ -73,8 +74,10 @@ class Session : public BnSession {
   private:
     LegacyHAL mHal;
     LockoutTracker mLockoutTracker;
+    std::unique_ptr<OpticalUdfps> mOpticalUdfps;  // Unique pointer for conditional initialization
     bool mClosed = false;
     bool mCaptureReady = false;
+    bool mMaskEnabled = false;
 
     Error VendorErrorFilter(int32_t error, int32_t* vendorCode);
     AcquiredInfo VendorAcquiredFilter(int32_t info, int32_t* vendorCode);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The LineageOS Project
+ * Copyright (C) 2025 The LineageOS Project
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,6 +8,7 @@
 #include "CancellationSignal.h"
 #include "Legacy2Aidl.h"
 #include "VendorConstants.h"
+#include "OpticalUdfps.h"
 
 #include <fingerprint.sysprop.h>
 
@@ -16,6 +17,7 @@
 #include <dirent.h>
 #include <endian.h>
 #include <thread>
+#include <fstream>
 
 using namespace ::android::fingerprint::samsung;
 using namespace ::std::chrono_literals;
@@ -51,6 +53,11 @@ Session::Session(LegacyHAL hal, int userId, std::shared_ptr<ISessionCallback> cb
             mSecUdfpsHelper->setFodRect(fodRect);
 #endif
         }
+
+    std::string sensorTypeProp = FingerprintHalProperties::type().value_or("");
+    if (sensorTypeProp == "udfps_optical") {
+        mOpticalUdfps = std::make_unique<OpticalUdfps>();
+    }
     }
 
     mDeathRecipient = AIBinder_DeathRecipient_new(onClientDeath);
@@ -253,6 +260,11 @@ ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t /*x*/, 
                                           float /*minor*/, float /*major*/) {
     LOG(INFO) << "onPointerDown";
 
+    if (mOpticalUdfps) {
+        mOpticalUdfps->enableMask();
+        mMaskEnabled = true;
+    }
+
     if (FingerprintHalProperties::request_touch_event().value_or(false)) {
         mHal.request(SEM_REQUEST_TOUCH_EVENT, 2);
     }
@@ -263,6 +275,11 @@ ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t /*x*/, 
 
 ndk::ScopedAStatus Session::onPointerUp(int32_t /*pointerId*/) {
     LOG(INFO) << "onPointerUp";
+
+    if (mOpticalUdfps) {
+        mOpticalUdfps->disableMask();
+        mMaskEnabled = false;
+    }
 
     if (FingerprintHalProperties::request_touch_event().value_or(false)) {
         mHal.request(SEM_REQUEST_TOUCH_EVENT, 1);
@@ -496,6 +513,12 @@ void Session::notify(const fingerprint_msg_t* msg) {
 
                 mCb->onAuthenticationSucceeded(msg->data.authenticated.finger.fid, authToken);
                 mLockoutTracker.reset(true);
+
+                // Clear the mask after successful authentication
+                if (mOpticalUdfps && mMaskEnabled) {
+                    mOpticalUdfps->disableMask();
+                    mMaskEnabled = false;
+                }
             } else {
                 mCb->onAuthenticationFailed();
                 mLockoutTracker.addFailedAttempt();

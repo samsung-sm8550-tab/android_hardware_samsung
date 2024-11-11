@@ -15,6 +15,7 @@ cc_binary {
         "LegacyHAL.cpp",
         "LockoutTracker.cpp",
         "SecUdfpsHelper.cpp",
+        "OpticalUdfps.cpp",
         "Session.cpp",
         "service.cpp",
     ],
