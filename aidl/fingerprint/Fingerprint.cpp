@@ -6,6 +6,7 @@
 
 #include "Fingerprint.h"
 #include "VendorConstants.h"
+#include "OpticalUdfps.h"
 
 #include <fingerprint.sysprop.h>
 
@@ -65,6 +66,11 @@ Fingerprint::Fingerprint() {
             FingerprintHalProperties::max_enrollments_per_user().value_or(MAX_ENROLLMENTS_PER_USER);
     mSupportsGestures =
             FingerprintHalProperties::supports_gestures().value_or(SUPPORTS_NAVIGATION_GESTURES);
+
+    if (mSensorType == FingerprintSensorType::UNDER_DISPLAY_OPTICAL) {
+        mOpticalUdfps = std::make_unique<OpticalUdfps>();
+        LOG(INFO) << "Optical UDFPS initialized for FOD";
+    }
 
     if (mSupportsGestures) {
         mHal.request(FINGERPRINT_REQUEST_NAVIGATION_MODE_START, 1);
