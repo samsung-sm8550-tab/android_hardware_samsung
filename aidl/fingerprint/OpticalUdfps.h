@@ -33,6 +33,8 @@ private:
     template <typename T>
     void set(const std::string& path, const T& value);
 
+    bool fileExists(const std::string& path);
+
     // Reads the display brightness directly from the brightness file.
     int readBrightness();
 
