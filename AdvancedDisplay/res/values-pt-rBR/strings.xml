@@ -32,9 +32,9 @@
     <string name="mdnie_scenario_gallery">Galeria</string>
     <string name="mdnie_scenario_vt">Chamada de vídeo</string>
     <string name="mdnie_scenario_browser">Navegador</string>
-    <string name="mdnie_scenario_ebook">e-book</string>
+    <string name="mdnie_scenario_ebook">eBook</string>
     <string name="mdnie_scenario_email">E-mail</string>
-    <string name="mdnie_scenario_tdmb">Televisão digital</string>
+    <string name="mdnie_scenario_tdmb">TV digital</string>
     <string name="mdnie_accessibility_normal">Normal</string>
     <string name="mdnie_accessibility_inverse">Invertido</string>
     <string name="mdnie_accessibility_color_blind">Daltônico</string>

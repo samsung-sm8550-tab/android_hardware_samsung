@@ -16,7 +16,6 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Налады экрана</string>
     <string name="category_screen_title">Экран</string>
     <string name="screen_colors_title">Колеры</string>
     <string name="mdnie_scenario_video_warm">Відэа (цёплыя тоны)</string>
