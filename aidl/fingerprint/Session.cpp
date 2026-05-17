@@ -199,6 +199,8 @@ ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t /*x*/, 
                                           float /*minor*/, float /*major*/) {
     LOG(INFO) << "onPointerDown";
 
+    mOpticalUdfps.setGreenCircle(true);
+
     if (FingerprintHalProperties::request_touch_event().value_or(false)) {
         mHal.request(SEM_REQUEST_TOUCH_EVENT, 2);
     }
@@ -209,6 +211,8 @@ ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t /*x*/, 
 
 ndk::ScopedAStatus Session::onPointerUp(int32_t /*pointerId*/) {
     LOG(INFO) << "onPointerUp";
+
+    mOpticalUdfps.setGreenCircle(false);
 
     if (FingerprintHalProperties::request_touch_event().value_or(false)) {
         mHal.request(SEM_REQUEST_TOUCH_EVENT, 1);
@@ -401,6 +405,7 @@ void Session::notify(const fingerprint_msg_t* msg) {
             int32_t vendorCode = 0;
             Error result = VendorErrorFilter(msg->data.error, &vendorCode);
             LOG(DEBUG) << "onError(" << static_cast<int>(result) << ")";
+            mOpticalUdfps.setGreenCircle(false);
             mCb->onError(result, vendorCode);
         } break;
         case FINGERPRINT_ACQUIRED: {
@@ -414,6 +419,9 @@ void Session::notify(const fingerprint_msg_t* msg) {
             if (FingerprintHalProperties::uses_percentage_samples().value_or(false)) {
                 const_cast<fingerprint_msg_t*>(msg)->data.enroll.samples_remaining =
                         100 - msg->data.enroll.samples_remaining;
+            }
+            if (msg->data.enroll.samples_remaining == 0) {
+                mOpticalUdfps.setGreenCircle(false);
             }
             if (FingerprintHalProperties::cancel_on_enroll_completion().value_or(false)) {
                 if (msg->data.enroll.samples_remaining == 0) {
@@ -437,6 +445,7 @@ void Session::notify(const fingerprint_msg_t* msg) {
         case FINGERPRINT_AUTHENTICATED: {
             LOG(DEBUG) << "onAuthenticated(fid=" << msg->data.authenticated.finger.fid
                        << ", gid=" << msg->data.authenticated.finger.gid << ")";
+            mOpticalUdfps.setGreenCircle(false);
             if (msg->data.authenticated.finger.fid != 0) {
                 const hw_auth_token_t hat = msg->data.authenticated.hat;
                 HardwareAuthToken authToken;

@@ -14,6 +14,7 @@ cc_binary {
         "Fingerprint.cpp",
         "LegacyHAL.cpp",
         "LockoutTracker.cpp",
+        "OpticalUdfps.cpp",
         "Session.cpp",
         "service.cpp",
     ],
