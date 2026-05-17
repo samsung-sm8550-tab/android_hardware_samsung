@@ -13,6 +13,7 @@
 
 #include "LegacyHAL.h"
 #include "LockoutTracker.h"
+#include "OpticalUdfps.h"
 
 #define FINGERPRINT_DATA_DIR "/data/vendor/biometrics/fp/User_%d/"
 
@@ -99,6 +100,8 @@ class Session : public BnSession {
     AIBinder_DeathRecipient* mDeathRecipient;
 
     DisplayState mDisplayState;
+
+    OpticalUdfps mOpticalUdfps;
 };
 
 }  // namespace fingerprint
